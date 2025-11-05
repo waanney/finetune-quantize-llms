@@ -1,25 +1,21 @@
 import os
 import io
 import json
-import torch
 import sys
 import logging
 import inspect
 import subprocess
 import contextlib
-# Import động để tránh lỗi khi chưa cài đặt
 from datasets import load_dataset, Dataset
 from IPython.display import display
 from huggingface_hub import login, HfApi
 from pathlib import Path
 from jinja2 import Template
 
-# FastLanguageModel sẽ được import động trong các hàm cần dùng
-
 MODEL_NAME = None
 AUTHOR = None
 HF_TOKEN = None
-_CURRENT_TOOL = None  # Track tool đang được dùng: "unsloth" hoặc "llamafactory"
+_CURRENT_TOOL = None  # Track which tool is currently active: "unsloth" or "llamafactory"
 
 
 def set(name, author):
@@ -32,16 +28,6 @@ def hf(token):
     global HF_TOKEN
     HF_TOKEN = token
     login(HF_TOKEN, add_to_git_credential=True)
-
-
-def identify_dataset(record):
-    global MODEL_NAME, AUTHOR
-    record["output"] = (
-        record["output"]
-        .replace("Gemma-tvts", MODEL_NAME)
-        .replace("Long Nguyen", AUTHOR)
-    )
-    return record
 
 
 # ============================================
@@ -141,9 +127,12 @@ def setup_llamafactory(force_reinstall=False):
     
     # Install LLaMA-Factory
     print("\n📦 Đang install LLaMA-Factory...")
-    os.chdir("/content/LLaMA-Factory")
-    subprocess.run(["pip", "install", "-e", ".[torch,bitsandbytes]"], check=False)
-    os.chdir("/content")
+    original_dir = os.getcwd()
+    try:
+        os.chdir("/content/LLaMA-Factory")
+        subprocess.run(["pip", "install", "-e", ".[torch,bitsandbytes]"], check=False)
+    finally:
+        os.chdir(original_dir)
     
     print("✅ Đã setup packages cho LLaMA-Factory xong!")
     print("=" * 80)
@@ -152,8 +141,17 @@ def setup_llamafactory(force_reinstall=False):
     _CURRENT_TOOL = "llamafactory"
 
 
+def identify_dataset(record):
+    global MODEL_NAME, AUTHOR
+    record["output"] = (
+        record["output"]
+        .replace("Gemma-tvts", MODEL_NAME)
+        .replace("Long Nguyen", AUTHOR)
+    )
+    return record
+
+
 def preprocess_dataset(dataset, num_to_train=None):
-    """Preprocess dataset cho LLaMA-Factory - tự động setup packages"""
     setup_llamafactory()
     
     dataset_df = dataset.to_pandas()
@@ -162,17 +160,12 @@ def preprocess_dataset(dataset, num_to_train=None):
     dataset_df["input"] = dataset_df["input"].fillna("")
     caller_locals = inspect.stack()[1][0].f_locals
     dataset_name = [name for name, val in caller_locals.items() if val is dataset][0]
-    
-    # Tạo thư mục data nếu chưa có
-    os.makedirs("/content/LLaMA-Factory/data", exist_ok=True)
-    
     file_path = f"/content/LLaMA-Factory/data/{dataset_name}.json"
     dataset_df.to_json(file_path, orient="records", force_ascii=False, indent=4)
     return file_path
 
 
 def dataset_info(*datasets):
-    """Tạo file dataset_info.json cho LLaMA-Factory - tự động setup packages"""
     setup_llamafactory()
     
     info = {}
@@ -182,10 +175,6 @@ def dataset_info(*datasets):
             0
         ]
         info[dataset_name] = {"file_name": f"{dataset_name}.json"}
-    
-    # Tạo thư mục data nếu chưa có
-    os.makedirs("/content/LLaMA-Factory/data", exist_ok=True)
-    
     file_path = "/content/LLaMA-Factory/data/dataset_info.json"
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
@@ -193,10 +182,21 @@ def dataset_info(*datasets):
 
 
 def train(datasets, num_train_epochs, continue_training=True):
-    """Train model với LLaMA-Factory - tự động setup packages"""
-    setup_llamafactory()
-    
-    caller_locals = inspect.stack()[1][0].f_locals
+    # Detect if datasets is a single dataset (Unsloth style) or a list (LLaMA-Factory style)
+    # If it's a list of datasets, use LLaMA-Factory; otherwise use Unsloth
+    if isinstance(datasets, list):
+        # LLaMA-Factory style: list of datasets
+        setup_llamafactory()
+        _train_llamafactory(datasets, num_train_epochs, continue_training)
+    else:
+        # Unsloth style: single dataset (could be combined dataset)
+        setup_unsloth()
+        _train_unsloth(datasets, num_train_epochs, continue_training)
+
+
+def _train_llamafactory(datasets, num_train_epochs, continue_training):
+    """Internal function for LLaMA-Factory training"""
+    caller_locals = inspect.stack()[2][0].f_locals  # Skip train() and _train_llamafactory()
     dataset_names = ",".join(
         [
             name
@@ -238,27 +238,82 @@ def train(datasets, num_train_epochs, continue_training=True):
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=4)
 
-    os.chdir("/content/LLaMA-Factory")
+    original_dir = os.getcwd()
+    try:
+        os.chdir("/content/LLaMA-Factory")
+        process = subprocess.Popen(
+            ["llamafactory-cli", "train", "train_gemma.json"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+
+        start_printing_all = False
+
+        for line in iter(process.stdout.readline, b""):
+            decoded_line = line.decode()
+            if "train metrics" in decoded_line.lower():
+                start_printing_all = True
+            if "loss" in decoded_line.lower() or start_printing_all:
+                print(decoded_line, end="")
+
+        process.stdout.close()
+        process.wait()
+    finally:
+        os.chdir(original_dir)
+
+
+def _train_unsloth(dataset, num_train_epochs, continue_training):
+    """Internal function for Unsloth training"""
+    from unsloth import FastLanguageModel
+    from trl import SFTTrainer
+    from transformers import TrainingArguments
     
-    # Đảm bảo LLaMA-Factory đã được cài đặt (đã setup trong setup_llamafactory())
-    # Chỉ cài lại nếu cần thiết
-    process = subprocess.Popen(
-        ["llamafactory-cli", "train", "train_gemma.json"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name="ura-hcmut/GemSUra-2B",
+        max_seq_length=2048,
+        dtype=None,
+        load_in_4bit=True,
     )
-
-    start_printing_all = False
-
-    for line in iter(process.stdout.readline, b""):
-        decoded_line = line.decode()
-        if "train metrics" in decoded_line.lower():
-            start_printing_all = True
-        if "loss" in decoded_line.lower() or start_printing_all:
-            print(decoded_line, end="")
-
-    process.stdout.close()
-    process.wait()
+    
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=16,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        lora_alpha=16,
+        lora_dropout=0,
+        bias="none",
+        use_gradient_checkpointing=True,
+        random_state=3407,
+    )
+    
+    if not continue_training:
+        # Reset adapter if needed
+        pass
+    
+    trainer = SFTTrainer(
+        model=model,
+        train_dataset=dataset,
+        tokenizer=tokenizer,
+        max_seq_length=2048,
+        dataset_text_field="output",
+        args=TrainingArguments(
+            per_device_train_batch_size=2,
+            gradient_accumulation_steps=4,
+            warmup_steps=5,
+            num_train_epochs=num_train_epochs,
+            learning_rate=2e-4,
+            fp16=True,
+            logging_steps=10,
+            output_dir="outputs",
+            optim="adamw_8bit",
+        ),
+    )
+    
+    trainer.train()
+    
+    # Save the adapter
+    model.save_pretrained("lora_model")
+    tokenizer.save_pretrained("lora_model")
 
 
 class SuppressLogging:
@@ -270,118 +325,123 @@ class SuppressLogging:
 
 
 def test():
-    """Test model đã được train với LLaMA-Factory - tự động setup packages"""
     setup_llamafactory()
     
-    os.chdir("/content/LLaMA-Factory/src")
-    from llamafactory.chat import ChatModel
-    from llamafactory.extras.misc import torch_gc
+    original_dir = os.getcwd()
+    try:
+        os.chdir("/content/LLaMA-Factory/src")
+        from llamafactory.chat import ChatModel
+        from llamafactory.extras.misc import torch_gc
+        os.chdir("/content/LLaMA-Factory")
 
-    os.chdir("/content/LLaMA-Factory")
+        args = dict(
+            model_name_or_path="ura-hcmut/GemSUra-2B",
+            adapter_name_or_path="gemma_lora",
+            template="gemma",
+            finetuning_type="lora",
+            quantization_bit=4,
+        )
 
-    args = dict(
-        model_name_or_path="ura-hcmut/GemSUra-2B",
-        adapter_name_or_path="gemma_lora",
-        template="gemma",
-        finetuning_type="lora",
-        quantization_bit=4,
-    )
+        with SuppressLogging():
+            chat_model = ChatModel(args)
 
-    with SuppressLogging():
-        chat_model = ChatModel(args)
+        print("***** Nhập clear để xóa lịch sử trò chuyện, nhập exit để thoát nha! *****")
+        messages = []
+        while True:
+            query = input("\nNgười dùng: ")
+            if query.strip().lower() == "exit":
+                break
+            if query.strip().lower() == "clear":
+                messages = []
+                torch_gc()
+                print("Lịch sử trò chuyện vừa được xóa.")
+                continue
 
-    print("***** Nhập clear để xóa lịch sử trò chuyện, nhập exit để thoát nha! *****")
-    messages = []
-    while True:
-        query = input("\nNgười dùng: ")
-        if query.strip().lower() == "exit":
-            break
-        if query.strip().lower() == "clear":
-            messages = []
-            torch_gc()
-            print("Lịch sử trò chuyện vừa được xóa.")
-            continue
+            messages.append({"role": "user", "content": query})
+            print(f"Trợ lý: ", end="", flush=True)
 
-        messages.append({"role": "user", "content": query})
-        print(f"Trợ lý: ", end="", flush=True)
-
-        response = ""
-        for new_text in chat_model.stream_chat(messages):
-            print(new_text, end="", flush=True)
-            response += new_text
-        print()
-        messages.append({"role": "assistant", "content": response})
-    torch_gc()
+            response = ""
+            for new_text in chat_model.stream_chat(messages):
+                print(new_text, end="", flush=True)
+                response += new_text
+            print()
+            messages.append({"role": "assistant", "content": response})
+        torch_gc()
+    finally:
+        os.chdir(original_dir)
 
 
 def merge_and_push(repo_id):
-    """Merge và push model lên Hugging Face với LLaMA-Factory - tự động setup packages"""
     setup_llamafactory()
     
-    os.chdir("/content/LLaMA-Factory/")
+    original_dir = os.getcwd()
+    try:
+        os.chdir("/content/LLaMA-Factory/")
 
-    args = dict(
-        model_name_or_path="ura-hcmut/GemSUra-2B",
-        adapter_name_or_path="gemma_lora",
-        template="gemma",
-        finetuning_type="lora",
-        export_dir="gemma_lora_merged",
-        export_size=2,
-        export_device="cpu",
-    )
-
-    with open("gemma_lora_merged.json", "w", encoding="utf-8") as f:
-        json.dump(args, f, ensure_ascii=False, indent=2)
-
-    with SuppressLogging(), open(os.devnull, "w") as devnull:
-        subprocess.run(
-            ["llamafactory-cli", "export", "gemma_lora_merged.json"],
-            stdout=devnull,
-            stderr=devnull,
-            check=True,
+        args = dict(
+            model_name_or_path="ura-hcmut/GemSUra-2B",
+            adapter_name_or_path="gemma_lora",
+            template="gemma",
+            finetuning_type="lora",
+            export_dir="gemma_lora_merged",
+            export_size=2,
+            export_device="cpu",
         )
 
-    print("***** Đã merge model thành công và tiến hành upload lên Huggingface! *****")
+        with open("gemma_lora_merged.json", "w", encoding="utf-8") as f:
+            json.dump(args, f, ensure_ascii=False, indent=2)
 
-    model_dir = "/content/LLaMA-Factory/gemma_lora_merged"
-    tokenizer_dir = "/content/LLaMA-Factory/gemma_lora"
+        with SuppressLogging(), open(os.devnull, "w") as devnull:
+            subprocess.run(
+                ["llamafactory-cli", "export", "gemma_lora_merged.json"],
+                stdout=devnull,
+                stderr=devnull,
+                check=True,
+            )
 
-    tokenizer_config_path = Path(tokenizer_dir) / "tokenizer_config.json"
-    with open(tokenizer_config_path, "r", encoding="utf-8") as f:
-        tokenizer_config = json.load(f)
-    tokenizer_config.pop("chat_template", None)
-    with open(tokenizer_config_path, "w", encoding="utf-8") as f:
-        json.dump(tokenizer_config, f, ensure_ascii=False, indent=4)
+        print("***** Đã merge model thành công và tiến hành upload lên Huggingface! *****")
 
-    tokenizer_files = [
-        "tokenizer.json",
-        "tokenizer.model",
-        "tokenizer_config.json",
-        "special_tokens_map.json",
-    ]
+        model_dir = "/content/LLaMA-Factory/gemma_lora_merged"
+        tokenizer_dir = "/content/LLaMA-Factory/gemma_lora"
 
-    api = HfApi()
-    global HF_TOKEN
+        tokenizer_config_path = Path(tokenizer_dir) / "tokenizer_config.json"
+        with open(tokenizer_config_path, "r", encoding="utf-8") as f:
+            tokenizer_config = json.load(f)
+        tokenizer_config.pop("chat_template", None)
+        with open(tokenizer_config_path, "w", encoding="utf-8") as f:
+            json.dump(tokenizer_config, f, ensure_ascii=False, indent=4)
 
-    for file in os.listdir(model_dir):
-        file_path = Path(model_dir) / file
-        api.upload_file(
-            path_or_fileobj=file_path,
-            path_in_repo=file,
-            repo_id=repo_id,
-            repo_type="model",
-            token=HF_TOKEN,
-        )
+        tokenizer_files = [
+            "tokenizer.json",
+            "tokenizer.model",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+        ]
 
-    for file_name in tokenizer_files:
-        file_path = Path(tokenizer_dir) / file_name
-        api.upload_file(
-            path_or_fileobj=file_path,
-            path_in_repo=file_name,
-            repo_id=repo_id,
-            repo_type="model",
-            token=HF_TOKEN,
-        )
+        api = HfApi()
+        global HF_TOKEN
+
+        for file in os.listdir(model_dir):
+            file_path = Path(model_dir) / file
+            api.upload_file(
+                path_or_fileobj=file_path,
+                path_in_repo=file,
+                repo_id=repo_id,
+                repo_type="model",
+                token=HF_TOKEN,
+            )
+
+        for file_name in tokenizer_files:
+            file_path = Path(tokenizer_dir) / file_name
+            api.upload_file(
+                path_or_fileobj=file_path,
+                path_in_repo=file_name,
+                repo_id=repo_id,
+                repo_type="model",
+                token=HF_TOKEN,
+            )
+    finally:
+        os.chdir(original_dir)
 
 
 model = None
@@ -390,16 +450,13 @@ messages = []
 
 
 def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
-    """Load model với unsloth để inference - tự động setup packages"""
     setup_unsloth()
-    
-    # Import động sau khi setup
-    from unsloth import FastLanguageModel
     
     logging.getLogger().setLevel(logging.ERROR)
     global model, tokenizer
 
     try:
+        from unsloth import FastLanguageModel
         model, tokenizer = FastLanguageModel.from_pretrained(
             model_name=model_name,
             max_seq_length=max_seq_length,
@@ -407,18 +464,12 @@ def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
             load_in_4bit=load_in_4bit,
         )
         FastLanguageModel.for_inference(model)
-        print(f"✅ Đã load model {model_name} thành công!")
     except Exception as e:
-        print(f"Lỗi khi load model: {e}")
         print("Bạn chỉ cần chạy inference một lần duy nhất, bạn không cần chạy lại!")
 
 
 def chat(max_new_tokens=128, history=True):
-    """Chat với model đã load bằng unsloth - tự động setup packages"""
     setup_unsloth()
-    
-    # Import động sau khi setup
-    from unsloth import FastLanguageModel
     
     global model, tokenizer, messages
 
@@ -463,43 +514,44 @@ def chat(max_new_tokens=128, history=True):
 
 
 def quantize_and_push(repo_id):
-    """Quantize model sang GGUF format và push lên Hugging Face - tự động setup packages"""
     setup_unsloth()
-    
-    # Import động sau khi setup
-    from unsloth import FastLanguageModel
     
     logging.getLogger("unsloth").setLevel(logging.CRITICAL)
     original_stdout = sys.stdout
     original_stderr = sys.stderr
     temp_stdout = io.StringIO()
-    os.chdir("/content")
-
-    global model, tokenizer, HF_TOKEN
+    original_dir = os.getcwd()
+    
     try:
-        with contextlib.redirect_stdout(temp_stdout), contextlib.redirect_stderr(
-            temp_stdout
-        ):
-            model.push_to_hub_gguf(
-                repo_id, tokenizer, token=HF_TOKEN
-            )
-    except Exception as e:
+        os.chdir("/content")
+
+        global model, tokenizer, HF_TOKEN
+        try:
+            with contextlib.redirect_stdout(temp_stdout), contextlib.redirect_stderr(
+                temp_stdout
+            ):
+                model.push_to_hub_gguf(
+                    repo_id, tokenizer, token=HF_TOKEN
+                )
+        except Exception as e:
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
+            return
+        finally:
+            temp_stdout.seek(0)
+            output_lines = temp_stdout.readlines()
+
         sys.stdout = original_stdout
         sys.stderr = original_stderr
-        return
+
+        start_printing = False
+        for line in output_lines:
+            if "main: quantize time" in line.lower():
+                start_printing = True
+            if start_printing:
+                print(line, end="")
     finally:
-        temp_stdout.seek(0)
-        output_lines = temp_stdout.readlines()
-
-    sys.stdout = original_stdout
-    sys.stderr = original_stderr
-
-    start_printing = False
-    for line in output_lines:
-        if "main: quantize time" in line.lower():
-            start_printing = True
-        if start_printing:
-            print(line, end="")
+        os.chdir(original_dir)
 
 
 def thank_you_and_good_luck():
