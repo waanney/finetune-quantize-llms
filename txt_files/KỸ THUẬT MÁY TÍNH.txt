@@ -1,0 +1,43 @@
+Giới thiệu
+
+Ngành Kỹ thuật Máy tỉnh thuộc nhóm ngành Máy tính và Công nghệ thông tin. Mục tiêu của chương trình ngành Kỹ thuật Máy tính là đào tạo ra những người học có chất lượng cao, có khả năng thiết kế, xây dựng và triển khai những hệ thống phần mềm và phần cứng cho máy tính và các thiết bị điều khiển nhằm đáp ứng nhu cầu trong nước và quốc tế. Đặc biệt, ngành Kỹ thuật Máy tính hướng tới những người học có khả năng thiết kế, hiện thực và tạo được các vì mạch bằng các công nghệ khác nhau. Người học tốt nghiệp ngành Kỹ thuật Máy tính cũng được trang bị những kiến thức cần thiết để có thể học tiếp cao học và tiến sĩ trong lĩnh vực Máy tính và Công nghệ thông tin.
+
+Kỹ thuật Máy tính là ngành kỹ thuật, có sự giao thoa giữa ngành - Khoa học Máy tính và Điện tử. Ngoài các vấn đề thuộc về máy tính như lập trình, thiết kế phần mềm, mạng máy tính và hệ điều hành, ngành Kỹ thuật Máy tính còn liên quan đến phần cứng và thiết kế vi mạch để hướng tới việc phát triển các ứng dụng phần mềm trên các hệ thống tính toán chuyên biệt, ví dụ nhận dạng khuôn mặt trên nền tảng thiết bị nhúng dùng trong nhà thông minh, giám sát chất lượng không khí sử dụng công nghệ internet vạn vật - cảm biến năng lượng thấp - điện toán đám mây. Đặc biệt, ở chuyên ngành Thiết kế Vi mạch số, người học có thể tập trung vào quy trình thiết kế và hiện thực các vi mạch với các công nghệ khác nhau để từ đó làm chủ công việc thiết kế vi mạch.
+
+Hiện tại, sinh viên theo học ngành Kỹ thuật Máy tính có thể theo đuổi các định hướng sau:
+Hệ thống tính toán hiện đại: người học sẽ đào sâu các kiến thức và kỹ năng liên quan đến các thống tính toán như hiệu năng cao, hệ thống nhúng, hệ thống lái cấu hình và thiết kế vi mạch dùng trong các nhóm ứng dụng như sử dụng trí tuệ nhân tạo, phân tích dữ liệu lớn, phân tích dữ liệu sinh học....
+Internet vạn vật (Internet of Things): người học sẽ đào sâu các kiến thức và kỹ năng liên quan đến các việc xây dựng các hệ thống dựa trên nền tảng Internet vạn vật như hệ thống tự hành, hệ thống giám sát môi trường, hệ thống điều khiển tự động hay các hệ thống liên quan đến an ninh mạng như phòng chống tấn công mạng, phòng chống giả mạo trên môi trường mạng, bảo mật các hệ thống mạng....
+Thiết kế Vi mạch số (Digital VLSI Design): người học được tìm hiểu, nghiên cứu và thực hành với các công cụ thiết kế vi mạch tiêu chuẩn của thế giới và sử dụng các thiết bị hỗ trợ thử nghiệm tiên tiến. Hàng năm, sản phẩm thiết kế tiêu biểu của sinh viên có thể được mang đi dự thi các cuộc thi thiết kế vi mạch trong và ngoài nước hoặc hỗ trợ chế tạo chịp thử nghiệm thông qua các đối tác là các trường và viện nghiên cứu ở nước ngoài.
+
+Mã ngành
+Chương trình Tiêu chuẩn: 107
+Chương trình Dạy và học bằng tiếng Anh: 207
+
+Các điểm đặc biệt của ngành
+Từ năm 2008, Trường Đại học Bách khoa tiến hành xây dựng hai chương trình đào tạo khoa học Máy tính và Kỹ thuật y tính theo chuẩn ABET. Đây là chuẩn dành cho các chương trình đào tạo về kỹ thuật và công nghệ được áp dụng phổ biến tại các trường đại học của Mỹ. Năm 2014, chương trình đào tạo ngành Kỹ thuật Máy tính là một trong hai chương trình đào tạo của Khoa Khoa học và Kỹ thuật Máy tính đạt được kiểm định ABET và cũng là hai chương trình đầu tiên của Việt Nam. Qua hoạt động xây dựng chương trình đào tạo theo chuẩn ABET, chất lượng của hai chương trình Kỹ thuật Máy tính và Khoa học Máy tính được nâng cao đến các chuẩn mực quốc tế. Người học tốt nghiệp từ những chương trình được ABET kiểm định sẽ được công nhận rộng rãi bởi các công ty và tổ chức của Mỹ.
+
+
+Cơ sở vật chất chất lượng cao
+Chương trình đào tạo Kỹ thuật Máy tính hiện đang sử dụng các phòng thí nghiệm chuyên biệt với rất nhiều thiết bị chuyên dụng phục vụ các hoạt động học tập và nghiên cứu của cả sinh viên và giảng viên. Các thiết bị chuyên dụng có thể kể đến như GPU, các board FPGA tính toàn hiệu năng cao và điện toàn biên, các board mạch phát triển hệ thống nhúng, các cảm biến chuyên dụng để phát triển các ứng dụng lại các hệ thống tính toán hiệu năng cao phục vụ cho các bài toàn dữ liệu lớn và trí tuệ nhân tạo. Các phòng thử nghiệm chuyên dụng của bộ môn được đầu tư đồng bộ ở cả hai cơ sở của trường. Ngành Kỹ thuật Máy tính được Công ty Cadance và Renesas trực tiếp hỗ trợ công cụ thiết kế bản quyền và chuyển giao kỹ thuật thiết kế vi mạch.
+
+Vị trí việc làm
+
+Chương trình đào tạo Kỹ thuật Máy tính cung cấp cho sinh viên kiến thức về các hệ thống tính toàn hiện đại như bộ xử lý đa nhân, hệ thống tính toàn nhiều lôi như GPU, vi mạch lập trình, điện toán đám mây, kết nối vạn vật và các phương pháp tiếp cận tiên tiến trong trí tuệ nhân tạo, an toàn thông tin và tính toán hiệu năng cao. Với những kỹ năng này, sinh viên có thể thiết kế và triển khai các hệ thống tính toán kết hợp phần cứng và phần mềm, như các hệ thống nhà thông minh, hệ thống điều khiển thông minh trong ô tô, các hệ thống quan trắc và giám sát sử dụng các thiết bị cảm biến hiện đại.
+
+Sinh viên tốt nghiệp có cơ hội nghề nghiệp với mức lương hàng đầu trong ngành khoa học, kỹ thuật và công nghệ. Nhiều cựu sinh viên của khoa đang làm việc và đảm nhận các vị trí quan trọng cho các công ty công nghệ hàng đầu thế giới như Marvell, Renesas, Synopsys.... ở lĩnh vực thiết kế vi mạch: hay Google, Microsoft, Facebook, Amazon và các công ty công nghệ trong nước như VNPT, Viettel, VNG, Zalo, FPT, KMS, TMA, Global CyberSoft, Mobifone, Bosch, Intel Vietnam, vv ở các lĩnh vực liên quan đến hệ thống nhúng, hệ thống tính toán hiệu năng cao... Ngoài ra, các cựu sinh viên của Khoa cùng đang làm việc ở nhiều quốc gia khác, đặc biệt là Mỹ, Nhật, Hàn Quốc và Singapore. Ngoài ra, SV tốt nghiệp ngành Kỹ thuật Máy tính hiện đã và đang học tập ở các bậc cao hơn ở các trường trên thế giới chuyên về thiết kế vi mạch, tính toán hiệu năng cao, hệ thống nhúng, tính toán tái cấu hình... như TUDelft (Hà Lan), UCC (Ireland), UEC (Tokyo), Cardiff (Vương Quốc Anh), Northwestern University (Hoa Kỳ), NUS (Singapore).....
+
+Quan hệ hợp tác và tuyển dụng
+
+Mỗi năm, Khoa tổ chức nhiều hoạt động kết nối giữa Doanh nghiệp và sinh viên. Hoạt động Gặp gỡ Doanh nghiệp để kết nối Khoa với Doanh nghiệp, cung cấp thông tin và lấy ý kiến góp ý. Hội chợ việc làm được tổ chức để quy tụ các Doanh nghiệp tìm kiếm nguồn nhân lực. Gửi sinh viên đi thực tập ngoài trường là hoạt động được triển khai đại trà vào học kỳ hè hằng năm. Ngoài ra, Khoa cũng tổ chức các hoạt động ngoại khóa khác như seminar, cuộc thi học thuật và tham quan.
+
+Học bổng trao đổi và học bổng toàn phần Sau đại học
+
+Các chương trình học bổng và trao đổi Sau Đại học bao gồm hỗ trợ nghiên cứu khoa học với kinh phí hỗ trợ cho học viên và nghiên cứu sinh, chương trình học bổng Sau Đại học của ĐHQG-HCM, chương trình học bổng của Quỹ đổi mới sáng tạo Vingroup, chương trình học bổng khuyến học Sau Đại học của Hội Thương gia Đài Loan tại Việt Nam, các chương trình học bổng Vallet, Pony Chung. Toshiba cùng chương trình học bổng trao đổi Erasmus Mundus đến các Trường Đại học ở Châu Âu.
+
+Liên hệ
+Tòa A3, Trường Đại học Bách khoa - ĐHQG-HCM, 268 Lý Thường Kiệt, Phường 14, Quận 10, TP. Hồ Chí Minh
+(84.8) 38.647.256 - ext: 7847
+fb.com/cse.hcmut
+fb.com/hcmut.ce
+cse.hcmut.edu.vn
+kkhktmt@hcmut.edu.vn

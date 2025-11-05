@@ -1,0 +1,40 @@
+Giới thiệu
+Chuyên ngành Thiết kế Vi mạch (chuyên ngành thuộc ngành Điện tử - Viễn Thông), là một trong những ngành đào tạo chất lượng cao, có tính ứng dụng cao và mang tính xu hướng toàn cầu. Thế kỷ XXI, những tiến bộ của khoa học công nghệ như trí tuệ nhân tạo. (AI), điện toán đám mây, phân tích dữ liệu lớn (Big Data), việc áp dụng các kỹ thuật này vào đời sống yêu cầu sự gia tăng đột biến việc sử dụng các chip, vi mạch điện tử trên toàn cầu. Do đó, xã hội đòi hỏi ngày càng tăng nhu cầu tuyển dụng các kỹ sư Thiết kế Vi mạch có trình độ cao để tham gia vào các công ty vi mạch trong và ngoài nước, cũng như để nghiên cứu, phát triển các chíp ứng dụng. Đây là cơ hội để ngành Thiết kế Vi mạch phát triển.
+
+Chương trình đào tạo Thiết kế Vi mạch tại Trường Đại học Bách khoa - ĐHQG-HCM hướng tới giúp các sinh viên phát triển kỹ năng toàn diện và trở thành những chuyên gia trong lĩnh vực thiết kế vi mạch, đáp ứng nhu cầu về nguồn lực cho các công ty vi mạch và có khả năng giải quyết các thách thức công nghệ của thời đại. đóng góp cho sự phát triển của xã hội.
+
+Chương trình đào tạo tập trung vào phát triển các kỹ năng chuyên môn cần thiết để sinh viên sau khi tốt nghiệp có khả năng nghiên cứu, thiết kế và ứng dụng công nghệ vi mạch vào đời sống. Bên cạnh đó, chương trình đào tạo còn hướng tới phát triển các kỹ năng mềm để sinh viên phát triển toàn diện, gợi mở khả năng tư duy, nghiên cứu, sáng tạo, thích nghi với sự phát triển không ngừng của công nghệ trong thời đại mới.
+
+Mã ngành
+
+Chương trình Tiêu chuẩn: 108
+Chương trình Tiên tiến: 208
+
+Các điểm đặc biệt của ngành
+
+Chương trình đào tạo chuyên ngành Thiết kế Vi mạch luôn được đánh giá cao bởi các doanh nghiệp, nhà tuyển dụng và đạt chuẩn quốc tế. Chương trình đào tạo đã được kiểm định thành công theo tiêu chuẩn AQAS (Agency for Quality Assurance through Accreditation of Study Programs).
+Điểm mạnh của chương trình đào tạo là sự cập nhật liên tục theo sự phát triển của công nghệ vi mạch trên thế giới. Điều này đem lại khả năng hội nhập quốc tế, khả năng làm việc tại các công ty đa quốc gia ở trong và ngoài nước cho sinh viên khi tốt nghiệp. Bên cạnh đó, sinh viên còn có cơ hội học tập bậc cao hơn trong và ngoài nước. Một số môn học trong chương trình đào tạo được thiết kế liên quan đến các công nghệ tiên tiến trên thế giới và luôn nhật như vi điều khiển, FPGA và SoC.
+
+
+Trang thiết bị nghiên cứu hiện đại
+
+Tại Trường Đại học Bách khoa - ĐHQG-HCM, sinh viên thuộc chuyên ngành Thiết kế Vi mạch được học tập trong các phòng thí nghiệm được trang bị cơ sở vật chất hiện đại. Nổi bật nhất là phòng thí nghiệm thiết kế vi mạch, vi mạch cao tần và MEMS: được trang bị các thiết bị hiện đại và đầy đủ nhất để đáp ứng yêu cầu của giảng dạy và nghiên cứu của sinh viên về lĩnh vực thiết kế vi mạch. Bên cạnh đó, khi học tập và nghiên cứu tại phòng thí nghiệm, sinh viên còn được trang bị các phần mềm mô phỏng, tính toán được hỗ trợ bởi các công ty vi mạch, giúp sinh viên tiếp cận và áp dụng kiến thức vào thực tế một cách hiệu quả
+
+Vị trí việc làm
+
+Ngành Thiết kế Vi mạch là một trong những lĩnh vực có nhiều cơ hội nghề nghiệp và được các nhà tuyển dụng quan tâm cao. Sau khi tốt nghiệp, sinh viên có thể làm việc trong các lĩnh vực như thiết kế, phát triển, sản xuất, kiểm định vi mạch.
+
+Quan hệ hợp tác và tuyển dụng
+
+Trường Đại học Bách khoa - ĐHQG-HCM là đối tác chiến lược với nhiều công ty hàng đầu thế giới trong lĩnh vực thiết kế vi mạch như INTEL, Renesas, MARVELL, ARM, Texas Instruments, Qualcomm, Samsung, Ampere, Savarti, Faraday and Realtek. Các công ty đều đánh giá cao năng lực chuyên môn và sự sáng tạo của sinh viên trường Đại học Bách khoa. Các công ty trên không chỉ tuyển dụng các bạn sinh viên sau khi tốt nghiệp mà còn thường xuyên tạo cơ hội thực tập cho sinh viên đang theo học. Điều này tạo cơ hội cho sinh viên có trải nghiệm kỹ thuật thực tế, áp dụng kiến thức đã học vào việc làm, và nắm bắt nhanh những kỹ năng cần thiết cho ngành nghề này.
+
+Các doanh nghiệp cũng thường xuyên hợp tác với trường trong việc tổ chức các workshop, hội thảo và các dự án nghiên cứu. Qua những hoạt động này, sinh viên có cơ hội tiếp xúc trực tiếp với những chuyên gia hàng đầu trong lĩnh vực, cập nhật được những công nghệ mới nhất trong lĩnh vực thiết kế vi mạch, học hỏi kinh nghiệm thực tế và mở rộng kiến thức chuyên môn.
+
+Liên hệ
+
+Phòng 201 Tòa Nhà B3, trường Đại học Bách khoa - ĐHQG-HCM, 268 Lý Thường Kiệt, Phường 14, Quận 10, TP. Hồ Chí Minh
+bmdt@hcmut.edu.vn
+doe.dee.hcmut.edu.vn
+www.facebook.com/Electronics.Dpt.HCMUT
+
+

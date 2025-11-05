@@ -1,0 +1,45 @@
+Giới thiệu
+
+Ngành Kỹ thuật Điện tử - Viễn thông là một trong những ngành đào tạo chất lượng cao, có tính ứng dụng cao và mang tính toàn cầu. Chương trình đào tạo hướng đến việc phát triển các kỹ sư có kiến thức chuyên môn sâu rộng về các lĩnh vực công nghệ viễn thông và thông tin, vi mạch, bán dẫn, hệ thống nhúng và hệ thống điện tử ứng dụng, xử lý tín hiệu âm thanh, hình ảnh và đa phương tiện.
+Các sinh viên của ngành học sẽ được trang bị các kiến thức liên quan đến các công nghệ tiêu biểu như thông tin di động và không dây, các hệ thống kết nối Internet of Things (IoT), siêu cao tần và anten, mạng viễn thông và mạng máy tính, xử lý số tín hiệu, trí tuệ nhân tạo, vi mạch số, vi mạch tín hiệu tương tự và hỗn hợp, vi mạch cao tần, MEMS, thiết kế hệ thống nhúng sử dụng vi điều khiển, FPGA, DSP và SoC.
+Sau khi tốt nghiệp, các kỹ sư có thể hiểu rõ các nguyên lý hoạt động của các mạng viễn thông, hệ thống thông tin, loi, có khả năng khai thác vận hành, nâng cấp các hệ thống, thiết bị điện tử viễn thông. Đồng thời, các kỹ sư này có thể nghiên cứu, thiết kế và phát triển hệ thống điện tử ứng dụng công nghệ viễn thông, công nghệ vi mạch, bản dẫn, xử lý tín hiệu và thông tin trong công nghiệp và dân dụng.
+Chương trình đào tạo tại Trường Đại học Bách khoa ĐHQG-HCM sẽ giúp các sinh viên trở thành những chuyên gia trong lĩnh vực kỹ thuật Điện tử - Viễn thông, có khả năng giải quyết các thách thức công nghệ trong thời đại số, đóng góp cho sự phát triển của ngành và đóng góp cho sự phát triển của xã hội.
+
+Mã ngành
+Chương trình Tiêu chuẩn: 108
+Chương trình Tiên tiến: 208
+
+Các điểm đặc biệt của ngành
+Chương trình đào tạo ngành Điện tử - Viễn thông đã được đánh giá cao và đạt chuẩn quốc tế bởi các doanh nghiệp và nhà tuyển dụng. Chương trình đào tạo chính quy ngành Điện Tử - Viễn Thông đã được kiểm định thành công theo tiêu chuẩn AQAS (Agency for Quality Assurance through Accreditation of Study Programs).
+Điểm mạnh của chương trình đào tạo là sự tiên tiến và hiện đại, cung cấp cơ hội học tập bậc cao hơn trong và ngoài nước. Chương trình đào tạo giúp sinh viên có kiến thức chuyên môn và tay nghề cao, có khả năng hiểu rõ các nguyên lý hoạt động của các mạng viễn thông, hệ thống thông tin, lot, có thể khai thác vận hành và nâng cấp các hệ thống và thiết bị điện tử-viễn thông. Các môn học trong chương trình đào tạo liên quan đến các công nghệ tiên tiến như 5G, IoT, AI/Machine Learning, hệ thống nhúng, vì mạch, giúp đáp ứng nhu cầu nguồn nhân lực lớn của các doanh nghiệp trong lĩnh vực công nghệ vi mạch, công nghệ thông tin
+
+Cơ sở vật chất chất lượng cao
+Cơ sở vật chất của ngành Điện tử - Viễn thông là các phòng thí nghiệm hiện đại, giúp sinh viên tiếp cận và áp dụng kiến thức vào thực tế. Trong đó, phòng thí nghiệm vi xử lý, kỹ thuật số, vật lý bán dẫn, thiết kế vi mạch, xử lý số tín hiệu, IoT và máy học, mạng thông tin dữ liệu, kỹ thuật viễn thông, kỹ thuật siêu cao tần được trang bị các thiết bị hiện đại và đầy đủ nhất để đáp ứng yêu cầu của giảng dạy và nghiên cứu trong lĩnh vực Điện tử-Viễn thông. Sinh viên sẽ được học tập và nghiên cứu trong môi trường chuyên nghiệp và hiệu quả.
+
+Vị trí việc làm
+Ngành Điện tử - Viễn thông là một trong những lĩnh vực có nhiều cơ hội nghề nghiệp và được các nhà tuyển dụng quan tâm cao. Sau khi tốt nghiệp, sinh viên có thể làm việc trong các lĩnh vực như vận hành, quản lý, khai thác và thiết kế các mạng điện thoại cố định và di động, mạng truyền dẫn quang, viba, thông tin vệ tinh, phát thanh truyền hình, mạng thông tin dữ liệu và nhiều lĩnh vực khác.
+
+Các sinh viên tốt nghiệp có thể làm việc tại các tập đoàn, tổng công ty, các phòng kỹ thuật, các viện nghiên cứu và các trường đại học về lĩnh vực điện tử viễn thông. Nhiều tập đoàn và công ty lớn như VNPT, Viettel, FPT, SVTECH, Intel, Renesas, Marvell, Bosch, Ericssion, Sony, Samsung, Siemens, Motorola đều tuyển dụng các kỹ sư Điện tử - Viễn thông tốt nghiệp Trường Đại học Bách khoa.
+
+Các đài truyền hình, đài phát thanh cũng cần đến nhân sự trong lĩnh vực này như HTV, VTV, VOH. Với nhiều cơ hội nghề nghiệp, sinh viên sau khi tốt nghiệp sẽ có nhiều lựa chọn và có thể phát triển sự nghiệp một cách bền vững.
+
+
+Quan hệ hợp tác và tuyển dụng
+Trường Đại học Bách khoa là đối tác chiến lược với nhiều công ty Điện tử - Viễn thông hàng đầu thế giới như BOSCH, RENESAS, INTEL, MARVELL và nhiều công ty trong nước như VNPT, FPT, SVTECH, VIETTEL TMA Solutions. Các công ty này thường tuyển dụng các kỹ sư và sinh viên trường Đại học Bách khoa làm việc trong lĩnh vực thiết kế, phát triển, sản xuất và lắp ráp các sản phẩm điện tử và viễn thông, đặc biệt là các sản phẩm liên quan đến AUTOSAR, lập trình nhúng; khai thác vận hành, thiết kế, tối ưu hệ thống viễn thông, mạng thông tin dữ liệu, loT và trí tuệ nhân tạo.
+
+Học bổng
+Sinh viên ngành Điện tử - Viễn thông có nhiều cơ hội nhận học bổng khuyến học, học bổng từ cựu sinh viên và các doanh nghiệp.
+
+Học bổng trao đổi và học bổng toàn phần Sau đại học
+Ngành Điện tử - Viễn thông là ngành công nghệ cao phát triển nhanh yêu cầu nguồn nhân lực chất lượng cao, do đó sinh viên tốt nghiệp ngành Điện tử - Viễn thông có nhiều cơ hội học bổng học Sau đại học trong và ngoài nước. Một số nước thường xuyên cấp học bổng trao đổi và học bổng sau đại học cho sinh viên ngành Điện tử - Viễn thông tại Trường Đại học Bách khoa - ĐHQG-HCM bao gồm Mỹ, Pháp, Đức, Úc, Canada, Nauy, Hàn Quốc.
+
+Liên hệ
+Phòng 201 Tòa B3, Trường Đại học Bách khoa - ĐHQG-HCM, 268 Lý Thường Kiệt, Phường 14, Quận 10, TP. Hồ Chí Minh
+bmdt@hcmut.edu.vn
+bmvt@hcmut.edu.vn
+doe.dee.hcmut.edu.vn
+dte.dee.hcmut.edu.vn
+facebook.com/Electronics Dpt.HCMUT
+facebook.com/hcmbktel
+
+

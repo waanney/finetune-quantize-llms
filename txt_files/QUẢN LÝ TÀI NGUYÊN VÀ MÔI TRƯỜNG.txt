@@ -1,0 +1,54 @@
+Giới thiệu
+Chương trình Đào tạo (CTĐT) ngành Quản lý Tài nguyên và Môi trường (Quản lý TNMT) được thiết kế giúp người học được trang bị các kiến thức và kỹ năng về quản lý môi trường và tài nguyên, bao gồm các lĩnh vực sau: Quản lý môi trường đô thị, khu công nghiệp và nông thôn, An toàn – Sức khỏe – Môi trường (HSE) tại các nhà máy/xínghiệp: Quản lý tài nguyên thiên nhiên (đất, nước, rừng, biển/ đới bờ); Quan trắc Môi trường; Đánh giá tác động và rủi ro môi trường: Ứng dụng Viễn thám và GIS trong quản lý tài nguyên môi trường và thiên tai; các giải pháp về công nghệ kiểm soát ô nhiễm môi trường và xử lý nước cấp, nước thải, khí thải và chất thải rắn; Biến đổi Khí hậu; Công nghệ Xanh,...
+
+Chương trình học và hoạt động dạy - học - thực hành được xây dựng theo cách tiếp cận CDIO (Conceive Design Implement Operate), gắn kết và phù hợp khung năng lực trình độ quốc gia VQF (Vietnam Qualifications Framework). Từ năm 2022, CTĐT của ngành Quản lý TNMT đã đạt chuẩn kiểm định quốc tế ASIIN (Accreditation Agency for Study Programs in Engineering, Informatics, Natural Sciences and Mathematics).
+
+Mã ngành
+Chương trình Tiêu chuẩn: 125
+Chương trình Dạy và học bằng tiếng Anh: 225
+
+Các điểm đặc biệt của ngành
+Ngành Quản lý Tài nguyên và Môi trường (Quản lý TNMT) có các CTĐT, gồm: Chương trình Tiêu chuẩn (4 năm), Chương trình Dạy và học bằng tiếng Anh (4 năm). Chương trình Cử nhân – Thạc sĩ (6 năm), Chương trình Liên thông Thạc sĩ (5 năm).
+
+Ngành Quản lý TNMT tại Trường Đại học Bách khoa - ĐHQG-HCM nổi bật về kiến thức, kỹ năng, phát huy tư duy sáng tạo đáp ứng nhu cầu cao của xã hội như sau:
+CTĐT bao gồm cả kiến thức quản lý, công nghệ trong lĩnh vực môi trường - tài nguyên.
+CTĐT bao gồm cả kiến thức chuyên môn và kiến thức kỹ năng mang tính ứng dụng cao và gắn liền với nhu cầu của xã hội.
+Các kiến thức lý thuyết và thực tiễn luôn được định kỳ cập nhật, bổ sung trong từng nội dung môn học bởi đội ngũ cán bộ giảng dạy có kinh nghiệm thực tiễn và trình độ chuyên môn cao.
+CTĐT luôn được đảm bảo cân bằng giữa lý thuyết và thực tiễn thông qua các môn học thí nghiệm, thực hành, thực tập và tham quan nhận thức về đối tượng học và nghiên cứu.
+Chương trình Dạy và học bằng tiếng Anh ngành Quản lý TNMT được tổ chức tại CS Lý Thường Kiệt (Quận 10) với những điểm nổi bật như:
+Được giảng dạy hoàn toàn bằng tiếng Anh, bởi đội ngũ giảng viên là giáo sư trong nước và quốc tế từ các Trường Đại học danh tiếng ở Châu Á, Châu Âu, Úc, Nhật, Mỹ....
+Sinh viên có cơ hội tiếp cận dễ dàng với các đề tài nghiên cứu khoa học hoặc các dự án nghiên cứu hợp tác của các giảng viên và giáo sư.
+Điều kiện học tập tốt (phòng học, PTN, ...) với nhiều dịch vụ (thư viện, canteen, phòng tự học, và được quản lý bởi Văn phòng Đào tạo Quốc tế - OISP) có chất lượng cao.
+Nhiều cơ hội học tập nâng cao (học bổng Thạc sĩ, Tiến sĩ và trao đổi), công việc tương lai trong môi trường hội nhập quốc tế.
+
+Cơ sở vật chất
+Phòng Thí nghiệm (PTN) Phân tích Môi trường (Environmental Analysis Laboratory) là PTN trọng tâm và chủ yếu phục vụ giảng dạy và nghiên cứu cho toàn bộ khoa và sinh viên, với diện tích 550 m2 tại CS1 và 2.000 m2 tại CS2 (Dĩ An). PTN được trang bị đầy đủ các thiết bị hiện đại phục vụ cho việc phân tích các thông số môi trường từ cơ bản đến nâng cao như máy quang phổ AAS, GC-MS, HPLC, GC, TOC, ICP-OES, Zetasizer, UV-Vis,... PTN cũng có nhiều mô hình xử lý quy mô phòng thí nghiệm và quy mô thí điểm khác nhau để sinh viên thực hành và thực hiện các ý tưởng nghiên cứu của mình về kỹ thuật xử lý nước cấp, nước thải; kỹ thuật xử lý khí thải; và kỹ thuật xử lý chất thải rắn.
+
+Vị trí việc làm
+Sau khi tốt nghiệp ngành Quản lý Tài nguyên và Môi trường (chuyên ngành Quản lý và Công nghệ Môi trường) của Trường Đại học Bách khoa - ĐHQG-HCM sẽ đáp ứng các nhu cầu xã hội và cơ hội cao trong tuyển dụng tại các cơ quan quản lý nhà nước về bảo vệ môi trường và tài nguyên (như Sở Tài nguyên và Môi trường các Tỉnh/Thành phố, các Phòng Tài nguyên và Môi trường quận/huyện); các khu công nghiệp: khu chế xuất, các công ty tư vấn môi trường trong nước và quốc tế; các Trung tâm/Viện nghiên cứu; các tổ chức phi chính phủ về quản lý tài nguyên và bảo vệ môi trường, và tại các doanh nghiệp, các nhà máy xí nghiệp.
+
+Quan hệ hợp tác và tuyển dụng
+Hợp tác liên kết các trường trong hệ thống ĐHQG-HCM, Khối các trường kỹ thuật hàng đầu Việt Nam; liên kết chuyển tiếp quốc tế với Úc, Nhật, New Zealand; các Đại học của Châu Âu; các Đại học của khu vực Đông Nam Á; Mỹ; Hàn Quốc; Đài Loan; Singapore;...
+Hợp tác với các đối tác trong tuyển dụng, bao gồm: Bộ TNMT, Cục Môi trường, Sở TNMT và các Ban/Ngành về Môi trường -Tài nguyên tại các địa phương. Ngoài ra, Khoa MITN còn có mạng lưới hợp tác với Doanh nghiệp (KCN Hiệp Phước, Wilo Vietnam, Hưng Thịnh Group): các Công ty tư vấn môi trường trong nước và nước ngoài.
+(fenr.hcmut.edu.vn/vi/tuyen-dung).
+
+Học bổng
+Các nguồn học bổng trong và ngoài nước gồm NK Lee: Han Team Scholarship: Jabil VietNam: HB Lâm Minh Triết: HB Vươn lên VN; PVEP, HB Lương Định Của: HB Đồng Hành.....
+Thông tin học bổng tại Khoa: fenr.hcmut.edu.vn/vi/hoc-bong
+
+Học bổng trao đổi và học bổng toàn phần Sau đại học
+Có cơ hội nhận học bổng từ các dự án quốc tế
+JICA Knowledge Co-Creation Program
+AUN-SEED Net
+Erasmus+ (Châu Âu)
+SEED (Canada)
+
+Liên hệ
+Nhà 89, Trường Đại học Bách khoa - ĐHQG-HCM, 268 Lý Thường Kiệt, Phường 14, Quận 10, TP. Hồ Chí Minh
+028 3863 9682
+fb.com/MOTN.BK TPHCM
+fenr.hcmut.edu.vn
+kmt@hcmut.edu.vn
+
+
+
