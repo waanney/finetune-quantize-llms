@@ -106,6 +106,10 @@ def train(datasets, num_train_epochs, continue_training=True):
     )
 
     file_path = "/content/LLaMA-Factory/train_qwen.json"
+    
+    # Xóa file config cũ nếu tồn tại để tránh dùng model name cũ
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=4)
