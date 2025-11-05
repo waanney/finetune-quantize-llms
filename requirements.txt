@@ -1,31 +1,18 @@
+# Core packages - installed once at the beginning
 torch
 torchaudio
 torchvision
-bitsandbytes
-accelerate
 datasets
-einops
-fastapi
-fire
-gradio
-matplotlib
-numpy
-packaging
+huggingface_hub
+IPython
+jinja2
 pandas
-peft
-protobuf
-pydantic
-pyyaml
-safetensors
-scipy
-sentencepiece
-sse-starlette
-tiktoken
-transformers
-trl
-uvicorn
-xformers
+numpy
 requests
 pyarrow<15.0.0a0,>=14.0.1
-unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
-triton
+
+# Note: The following packages are managed dynamically by module.py:
+# - unsloth, trl, transformers, peft, accelerate, bitsandbytes (for Unsloth)
+# - llamafactory, llamafactory-cli (for LLaMA-Factory)
+# These will be automatically installed/uninstalled as needed when calling functions.
+# No need to install them manually or restart runtime when switching between tools.
