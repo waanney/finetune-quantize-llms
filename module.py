@@ -16,12 +16,42 @@ MODEL_NAME = None
 AUTHOR = None
 HF_TOKEN = None
 _CURRENT_TOOL = None  # Track which tool is currently active: "unsloth" or "llamafactory"
+BASE_MODEL = "Qwen/Qwen3-8B-Instruct"  # Default model, can be changed with set_model()
+MODEL_TEMPLATE = "qwen"  # Default template for the model
 
 
 def set(name, author):
     global MODEL_NAME, AUTHOR
     MODEL_NAME = name
     AUTHOR = author
+
+
+def set_model(model_name, template=None):
+    """
+    Set the base model to use for fine-tuning
+    
+    Args:
+        model_name: HuggingFace model name (e.g., "Qwen/Qwen3-8B-Instruct", "ura-hcmut/GemSUra-2B")
+        template: Template name for the model (e.g., "qwen", "gemma"). If None, will auto-detect based on model name
+    """
+    global BASE_MODEL, MODEL_TEMPLATE
+    BASE_MODEL = model_name
+    
+    # Auto-detect template if not provided
+    if template is None:
+        model_lower = model_name.lower()
+        if "qwen" in model_lower:
+            MODEL_TEMPLATE = "qwen"
+        elif "gemma" in model_lower or "gemsura" in model_lower:
+            MODEL_TEMPLATE = "gemma"
+        elif "llama" in model_lower:
+            MODEL_TEMPLATE = "llama3"
+        elif "mistral" in model_lower:
+            MODEL_TEMPLATE = "mistral"
+        else:
+            MODEL_TEMPLATE = "qwen"  # Default to qwen
+    else:
+        MODEL_TEMPLATE = template
 
 
 def hf(token):
@@ -207,17 +237,19 @@ def _train_llamafactory(datasets, num_train_epochs, continue_training):
     )
 
     if not continue_training:
-        os.system("rm -rf /content/LLaMA-Factory/gemma_lora")
+        os.system("rm -rf /content/LLaMA-Factory/lora_model")
 
+    global BASE_MODEL, MODEL_TEMPLATE
+    
     args = dict(
         stage="sft",
         do_train=True,
-        model_name_or_path="ura-hcmut/GemSUra-2B",
+        model_name_or_path=BASE_MODEL,
         dataset=dataset_names,
-        template="gemma",
+        template=MODEL_TEMPLATE,
         finetuning_type="lora",
         lora_target="all",
-        output_dir="gemma_lora",
+        output_dir="lora_model",
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
         lr_scheduler_type="cosine",
@@ -233,7 +265,7 @@ def _train_llamafactory(datasets, num_train_epochs, continue_training):
         fp16=True,
     )
 
-    file_path = "/content/LLaMA-Factory/train_gemma.json"
+    file_path = "/content/LLaMA-Factory/train_config.json"
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=4)
@@ -242,7 +274,7 @@ def _train_llamafactory(datasets, num_train_epochs, continue_training):
     try:
         os.chdir("/content/LLaMA-Factory")
         process = subprocess.Popen(
-            ["llamafactory-cli", "train", "train_gemma.json"],
+            ["llamafactory-cli", "train", "train_config.json"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
@@ -268,8 +300,10 @@ def _train_unsloth(dataset, num_train_epochs, continue_training):
     from trl import SFTTrainer
     from transformers import TrainingArguments
     
+    global BASE_MODEL
+    
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="ura-hcmut/GemSUra-2B",
+        model_name=BASE_MODEL,
         max_seq_length=2048,
         dtype=None,
         load_in_4bit=True,
@@ -334,10 +368,12 @@ def test():
         from llamafactory.extras.misc import torch_gc
         os.chdir("/content/LLaMA-Factory")
 
+        global BASE_MODEL, MODEL_TEMPLATE
+        
         args = dict(
-            model_name_or_path="ura-hcmut/GemSUra-2B",
-            adapter_name_or_path="gemma_lora",
-            template="gemma",
+            model_name_or_path=BASE_MODEL,
+            adapter_name_or_path="lora_model",
+            template=MODEL_TEMPLATE,
             finetuning_type="lora",
             quantization_bit=4,
         )
@@ -378,22 +414,24 @@ def merge_and_push(repo_id):
     try:
         os.chdir("/content/LLaMA-Factory/")
 
+        global BASE_MODEL, MODEL_TEMPLATE
+        
         args = dict(
-            model_name_or_path="ura-hcmut/GemSUra-2B",
-            adapter_name_or_path="gemma_lora",
-            template="gemma",
+            model_name_or_path=BASE_MODEL,
+            adapter_name_or_path="lora_model",
+            template=MODEL_TEMPLATE,
             finetuning_type="lora",
-            export_dir="gemma_lora_merged",
+            export_dir="lora_model_merged",
             export_size=2,
             export_device="cpu",
         )
 
-        with open("gemma_lora_merged.json", "w", encoding="utf-8") as f:
+        with open("lora_model_merged.json", "w", encoding="utf-8") as f:
             json.dump(args, f, ensure_ascii=False, indent=2)
 
         with SuppressLogging(), open(os.devnull, "w") as devnull:
             subprocess.run(
-                ["llamafactory-cli", "export", "gemma_lora_merged.json"],
+                ["llamafactory-cli", "export", "lora_model_merged.json"],
                 stdout=devnull,
                 stderr=devnull,
                 check=True,
@@ -401,8 +439,8 @@ def merge_and_push(repo_id):
 
         print("***** Đã merge model thành công và tiến hành upload lên Huggingface! *****")
 
-        model_dir = "/content/LLaMA-Factory/gemma_lora_merged"
-        tokenizer_dir = "/content/LLaMA-Factory/gemma_lora"
+        model_dir = "/content/LLaMA-Factory/lora_model_merged"
+        tokenizer_dir = "/content/LLaMA-Factory/lora_model"
 
         tokenizer_config_path = Path(tokenizer_dir) / "tokenizer_config.json"
         with open(tokenizer_config_path, "r", encoding="utf-8") as f:
@@ -471,9 +509,28 @@ def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
 def chat(max_new_tokens=128, history=True):
     setup_unsloth()
     
-    global model, tokenizer, messages
+    global model, tokenizer, messages, MODEL_TEMPLATE
 
-    chat_template = """{{ '<bos>' }}{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"""
+    # Determine if we should use tokenizer's chat template
+    use_tokenizer_template = False
+    if hasattr(tokenizer, 'apply_chat_template') and hasattr(tokenizer, 'chat_template') and tokenizer.chat_template is not None:
+        try:
+            # Test if tokenizer template works
+            test_messages = [{"role": "user", "content": "test"}]
+            tokenizer.apply_chat_template(test_messages, tokenize=False, add_generation_prompt=True)
+            use_tokenizer_template = True
+        except:
+            use_tokenizer_template = False
+    
+    # Fallback custom template based on model type
+    if not use_tokenizer_template:
+        if MODEL_TEMPLATE == "qwen" or MODEL_TEMPLATE == "qwen3":
+            chat_template = """{% for message in messages %}{% if message['role'] == 'user' %}<|im_start|>user\n{{ message['content'] }}<|im_end|>\n<|im_start|>assistant\n{% elif message['role'] == 'assistant' %}{{ message['content'] }}<|im_end|>\n{% endif %}{% endfor %}"""
+        elif MODEL_TEMPLATE == "gemma":
+            chat_template = """{{ '<bos>' }}{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"""
+        else:
+            # Default to Qwen template
+            chat_template = """{% for message in messages %}{% if message['role'] == 'user' %}<|im_start|>user\n{{ message['content'] }}<|im_end|>\n<|im_start|>assistant\n{% elif message['role'] == 'assistant' %}{{ message['content'] }}<|im_end|>\n{% endif %}{% endfor %}"""
 
     messages = []
 
@@ -491,8 +548,13 @@ def chat(max_new_tokens=128, history=True):
         else:
             messages = [{"role": "user", "content": query}]
 
-        template = Template(chat_template)
-        input_text = template.render(messages=messages)
+        if use_tokenizer_template:
+            # Use tokenizer's built-in chat template
+            input_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        else:
+            # Use custom template (chat_template is defined in the if block above)
+            template = Template(chat_template)
+            input_text = template.render(messages=messages)
 
         print(f"Trợ lý: ", end="", flush=True)
 
@@ -503,10 +565,24 @@ def chat(max_new_tokens=128, history=True):
         )
 
         decoded_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        if "model" in decoded_text:
-            response = decoded_text.split("model")[-1].strip()
+        
+        # Extract response based on model type
+        if MODEL_TEMPLATE == "qwen" or MODEL_TEMPLATE == "qwen3":
+            if "<|im_start|>assistant" in decoded_text:
+                response = decoded_text.split("<|im_start|>assistant")[-1].split("<|im_end|>")[0].strip()
+            else:
+                response = decoded_text.strip()
+        elif MODEL_TEMPLATE == "gemma":
+            if "model" in decoded_text:
+                response = decoded_text.split("model")[-1].strip()
+            else:
+                response = decoded_text.strip()
         else:
+            # Default extraction
             response = decoded_text.strip()
+            if "<|im_start|>assistant" in response:
+                response = response.split("<|im_start|>assistant")[-1].split("<|im_end|>")[0].strip()
+        
         print(response)
 
         if history:
