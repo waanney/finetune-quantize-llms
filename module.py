@@ -79,17 +79,17 @@ def train(datasets, num_train_epochs, continue_training=True):
     )
 
     if not continue_training:
-        os.system("rm -rf /content/LLaMA-Factory/gemma_lora")
+        os.system("rm -rf /content/LLaMA-Factory/qwen_lora")
 
     args = dict(
         stage="sft",
         do_train=True,
-        model_name_or_path="ura-hcmut/GemSUra-2B",
+        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
         dataset=dataset_names,
-        template="gemma",
+        template="qwen",
         finetuning_type="lora",
         lora_target="all",
-        output_dir="gemma_lora",
+        output_dir="qwen_lora",
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
         lr_scheduler_type="cosine",
@@ -105,7 +105,7 @@ def train(datasets, num_train_epochs, continue_training=True):
         fp16=True,
     )
 
-    file_path = "/content/LLaMA-Factory/train_gemma.json"
+    file_path = "/content/LLaMA-Factory/train_qwen.json"
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=4)
@@ -114,7 +114,7 @@ def train(datasets, num_train_epochs, continue_training=True):
 
     subprocess.run(["pip", "install", "-e", ".[torch,bitsandbytes]"], check=True)
     process = subprocess.Popen(
-        ["llamafactory-cli", "train", "train_gemma.json"],
+        ["llamafactory-cli", "train", "train_qwen.json"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -148,9 +148,9 @@ def test():
     os.chdir("/content/LLaMA-Factory")
 
     args = dict(
-        model_name_or_path="ura-hcmut/GemSUra-2B",
-        adapter_name_or_path="gemma_lora",
-        template="gemma",
+        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
+        adapter_name_or_path="qwen_lora",
+        template="qwen",
         finetuning_type="lora",
         quantization_bit=4,
     )
@@ -186,21 +186,21 @@ def merge_and_push(repo_id):
     os.chdir("/content/LLaMA-Factory/")
 
     args = dict(
-        model_name_or_path="ura-hcmut/GemSUra-2B",
-        adapter_name_or_path="gemma_lora",
-        template="gemma",
+        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
+        adapter_name_or_path="qwen_lora",
+        template="qwen",
         finetuning_type="lora",
-        export_dir="gemma_lora_merged",
+        export_dir="qwen_lora_merged",
         export_size=2,
         export_device="cpu",
     )
 
-    with open("gemma_lora_merged.json", "w", encoding="utf-8") as f:
+    with open("qwen_lora_merged.json", "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=2)
 
     with SuppressLogging(), open(os.devnull, "w") as devnull:
         subprocess.run(
-            ["llamafactory-cli", "export", "gemma_lora_merged.json"],
+            ["llamafactory-cli", "export", "qwen_lora_merged.json"],
             stdout=devnull,
             stderr=devnull,
             check=True,
@@ -208,8 +208,8 @@ def merge_and_push(repo_id):
 
     print("***** Đã merge model thành công và tiến hành upload lên Huggingface! *****")
 
-    model_dir = "/content/LLaMA-Factory/gemma_lora_merged"
-    tokenizer_dir = "/content/LLaMA-Factory/gemma_lora"
+    model_dir = "/content/LLaMA-Factory/qwen_lora_merged"
+    tokenizer_dir = "/content/LLaMA-Factory/qwen_lora"
 
     tokenizer_config_path = Path(tokenizer_dir) / "tokenizer_config.json"
     with open(tokenizer_config_path, "r", encoding="utf-8") as f:
@@ -273,7 +273,7 @@ def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
 def chat(max_new_tokens=128, history=True):
     global model, tokenizer, messages
 
-    chat_template = """{{ '<bos>' }}{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"""
+    chat_template = """{% for message in messages %}{% if message['role'] == 'user' %}{{ '<|im_start|>user\n' + message['content'] + '<|im_end|>\n<|im_start|>assistant\n' }}{% elif message['role'] == 'assistant' %}{{ message['content'] + '<|im_end|>\n' }}{% endif %}{% endfor %}"""
 
     messages = []
 
@@ -303,8 +303,10 @@ def chat(max_new_tokens=128, history=True):
         )
 
         decoded_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        if "model" in decoded_text:
-            response = decoded_text.split("model")[-1].strip()
+        if "assistant" in decoded_text:
+            response = decoded_text.split("assistant")[-1].strip()
+            if "<|im_end|>" in response:
+                response = response.split("<|im_end|>")[0].strip()
         else:
             response = decoded_text.strip()
         print(response)
