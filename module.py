@@ -84,9 +84,9 @@ def train(datasets, num_train_epochs, continue_training=True):
     args = dict(
         stage="sft",
         do_train=True,
-        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
+        model_name_or_path="Qwen/Qwen3-8B",
         dataset=dataset_names,
-        template="qwen",
+        template="qwen3",
         finetuning_type="lora",
         lora_target="all",
         output_dir="qwen_lora",
@@ -148,9 +148,9 @@ def test():
     os.chdir("/content/LLaMA-Factory")
 
     args = dict(
-        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
+        model_name_or_path="Qwen/Qwen3-8B",
         adapter_name_or_path="qwen_lora",
-        template="qwen",
+        template="qwen3",
         finetuning_type="lora",
         quantization_bit=4,
     )
@@ -186,9 +186,9 @@ def merge_and_push(repo_id):
     os.chdir("/content/LLaMA-Factory/")
 
     args = dict(
-        model_name_or_path="Qwen/Qwen2.5-8B-Instruct",
+        model_name_or_path="Qwen/Qwen3-8B",
         adapter_name_or_path="qwen_lora",
-        template="qwen",
+        template="qwen3",
         finetuning_type="lora",
         export_dir="qwen_lora_merged",
         export_size=2,
