@@ -7,18 +7,19 @@ import logging
 import inspect
 import subprocess
 import contextlib
-from unsloth import FastLanguageModel, is_bfloat16_supported
+# Import động để tránh lỗi khi chưa cài đặt
 from datasets import load_dataset, Dataset
 from IPython.display import display
 from huggingface_hub import login, HfApi
 from pathlib import Path
 from jinja2 import Template
-from trl import SFTTrainer
-from transformers import TrainingArguments
+
+# FastLanguageModel sẽ được import động trong các hàm cần dùng
 
 MODEL_NAME = None
 AUTHOR = None
 HF_TOKEN = None
+_CURRENT_TOOL = None  # Track tool đang được dùng: "unsloth" hoặc "llamafactory"
 
 
 def set(name, author):
@@ -44,129 +45,136 @@ def identify_dataset(record):
 
 
 # ============================================
-# CÁC HÀM HỖ TRỢ UNSLOTH
+# HÀM QUẢN LÝ PACKAGES ĐỘNG
 # ============================================
 
-def train(dataset, num_train_epochs=3, max_seq_length=2048, continue_training=True):
+def setup_unsloth(force_reinstall=False):
     """
-    Train model với unsloth
+    Setup packages cho Unsloth - uninstall LLaMA-Factory và install packages cho Unsloth
     
     Args:
-        dataset: Dataset object từ datasets (cần có columns "input" và "output")
-        num_train_epochs: Số epochs để train
-        max_seq_length: Độ dài tối đa của sequence
-        continue_training: Nếu True, tiếp tục train từ checkpoint cũ
+        force_reinstall: Nếu True, sẽ reinstall lại ngay cả khi đã setup
     """
-    global model, tokenizer
+    global _CURRENT_TOOL
     
-    model_name = "Qwen/Qwen3-8B"
+    if _CURRENT_TOOL == "unsloth" and not force_reinstall:
+        print("✅ Unsloth đã được setup sẵn, bỏ qua...")
+        return
     
     print("=" * 80)
-    print("🚀 BẮT ĐẦU TRAINING VỚI UNSLOTH")
+    print("🔧 ĐANG SETUP PACKAGES CHO UNSLOTH")
     print("=" * 80)
-    print(f"📊 Model: {model_name}")
-    print(f"🔄 Epochs: {num_train_epochs}")
-    print(f"📏 Max sequence length: {max_seq_length}")
+    
+    # Uninstall LLaMA-Factory nếu có
+    print("\n📦 Đang uninstall LLaMA-Factory...")
+    try:
+        subprocess.run(["pip", "uninstall", "-y", "llamafactory-cli", "llamafactory"], 
+                      check=False, capture_output=True)
+        print("✅ Đã uninstall LLaMA-Factory")
+    except:
+        pass
+    
+    # Install packages cho Unsloth
+    print("\n📦 Đang install packages cho Unsloth...")
+    unsloth_packages = [
+        "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git",
+        "trl",
+        "transformers",
+        "peft",
+        "accelerate",
+        "bitsandbytes",
+        "datasets",
+    ]
+    
+    for package in unsloth_packages:
+        try:
+            subprocess.run(["pip", "install", "-q", "--upgrade", package], check=False)
+        except:
+            pass
+    
+    print("✅ Đã setup packages cho Unsloth xong!")
     print("=" * 80)
     print()
     
-    # Load model với unsloth và cấu hình LoRA
-    print("📦 Đang load model...")
-    model, tokenizer = FastLanguageModel.get_peft_model(
-        model_name=model_name,
-        max_seq_length=max_seq_length,
-        dtype=None,
-        load_in_4bit=True,
-        r=16,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
-                        "gate_proj", "up_proj", "down_proj"],
-        lora_alpha=16,
-        lora_dropout=0,
-        bias="none",
-        use_gradient_checkpointing="unsloth",
-        random_state=3407,
-        use_rslora=False,
-        loftq_config=None,
-    )
+    _CURRENT_TOOL = "unsloth"
+
+
+def setup_llamafactory(force_reinstall=False):
+    """
+    Setup packages cho LLaMA-Factory - uninstall Unsloth và install packages cho LLaMA-Factory
     
-    print("✅ Đã load model xong!\n")
+    Args:
+        force_reinstall: Nếu True, sẽ reinstall lại ngay cả khi đã setup
+    """
+    global _CURRENT_TOOL
     
-    # Format dataset cho unsloth
-    print("📝 Đang format dataset...")
-    def formatting_prompts_func(examples):
-        inputs = examples["input"]
-        outputs = examples["output"]
-        texts = []
-        for instruction, output in zip(inputs, outputs):
-            text = f"<|im_start|>user\n{instruction}<|im_end|>\n<|im_start|>assistant\n{output}<|im_end|>\n"
-            texts.append(text)
-        return {"text": texts}
+    if _CURRENT_TOOL == "llamafactory" and not force_reinstall:
+        print("✅ LLaMA-Factory đã được setup sẵn, bỏ qua...")
+        return
     
-    dataset = dataset.map(formatting_prompts_func, batched=True)
-    print("✅ Đã format dataset xong!\n")
-    
-    # Training arguments
-    print("🎯 Đang khởi động training...\n")
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=dataset,
-        dataset_text_field="text",
-        max_seq_length=max_seq_length,
-        dataset_num_proc=2,
-        packing=False,
-        args=TrainingArguments(
-            per_device_train_batch_size=2,
-            gradient_accumulation_steps=4,
-            warmup_steps=5,
-            num_train_epochs=num_train_epochs,
-            learning_rate=2e-4,
-            fp16=not is_bfloat16_supported(),
-            bf16=is_bfloat16_supported(),
-            logging_steps=10,
-            optim="adamw_8bit",
-            weight_decay=0.01,
-            lr_scheduler_type="linear",
-            seed=3407,
-            output_dir="outputs",
-            save_strategy="epoch",
-            save_total_limit=3,
-        ),
-    )
-    
-    # Train
-    trainer_stats = trainer.train()
-    print("\n" + "=" * 80)
-    print("✅ TRAINING HOÀN THÀNH!")
+    print("=" * 80)
+    print("🔧 ĐANG SETUP PACKAGES CHO LLaMA-FACTORY")
     print("=" * 80)
     
-    # Save model
-    model.save_pretrained("qwen_lora")
-    tokenizer.save_pretrained("qwen_lora")
-    print("\n💾 Đã lưu model vào 'qwen_lora'")
+    # Uninstall Unsloth nếu có
+    print("\n📦 Đang uninstall Unsloth...")
+    try:
+        subprocess.run(["pip", "uninstall", "-y", "unsloth"], 
+                      check=False, capture_output=True)
+        print("✅ Đã uninstall Unsloth")
+    except:
+        pass
     
-    return model, tokenizer
+    # Uninstall trl nếu có (có thể conflict với LLaMA-Factory)
+    try:
+        subprocess.run(["pip", "uninstall", "-y", "trl"], 
+                      check=False, capture_output=True)
+    except:
+        pass
+    
+    # Clone LLaMA-Factory nếu chưa có
+    if not os.path.exists("/content/LLaMA-Factory"):
+        print("\n📥 Đang clone LLaMA-Factory...")
+        subprocess.run(["git", "clone", "https://github.com/hiyouga/LLaMA-Factory.git", "/content/LLaMA-Factory"], 
+                      check=False)
+        print("✅ Đã clone LLaMA-Factory")
+    
+    # Install LLaMA-Factory
+    print("\n📦 Đang install LLaMA-Factory...")
+    os.chdir("/content/LLaMA-Factory")
+    subprocess.run(["pip", "install", "-e", ".[torch,bitsandbytes]"], check=False)
+    os.chdir("/content")
+    
+    print("✅ Đã setup packages cho LLaMA-Factory xong!")
+    print("=" * 80)
+    print()
+    
+    _CURRENT_TOOL = "llamafactory"
 
-
-# ============================================
-# CÁC HÀM HỖ TRỢ LLaMA-FACTORY
-# ============================================
 
 def preprocess_dataset(dataset, num_to_train=None):
-    """Preprocess dataset cho LLaMA-Factory"""
+    """Preprocess dataset cho LLaMA-Factory - tự động setup packages"""
+    setup_llamafactory()
+    
     dataset_df = dataset.to_pandas()
     if num_to_train is not None:
         dataset_df = dataset_df.head(num_to_train)
     dataset_df["input"] = dataset_df["input"].fillna("")
     caller_locals = inspect.stack()[1][0].f_locals
     dataset_name = [name for name, val in caller_locals.items() if val is dataset][0]
+    
+    # Tạo thư mục data nếu chưa có
+    os.makedirs("/content/LLaMA-Factory/data", exist_ok=True)
+    
     file_path = f"/content/LLaMA-Factory/data/{dataset_name}.json"
     dataset_df.to_json(file_path, orient="records", force_ascii=False, indent=4)
     return file_path
 
 
 def dataset_info(*datasets):
-    """Tạo file dataset_info.json cho LLaMA-Factory"""
+    """Tạo file dataset_info.json cho LLaMA-Factory - tự động setup packages"""
+    setup_llamafactory()
+    
     info = {}
     for dataset in datasets:
         caller_locals = inspect.stack()[1][0].f_locals
@@ -174,14 +182,20 @@ def dataset_info(*datasets):
             0
         ]
         info[dataset_name] = {"file_name": f"{dataset_name}.json"}
+    
+    # Tạo thư mục data nếu chưa có
+    os.makedirs("/content/LLaMA-Factory/data", exist_ok=True)
+    
     file_path = "/content/LLaMA-Factory/data/dataset_info.json"
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
     return file_path
 
 
-def train_llamafactory(datasets, num_train_epochs, continue_training=True):
-    """Train model với LLaMA-Factory"""
+def train(datasets, num_train_epochs, continue_training=True):
+    """Train model với LLaMA-Factory - tự động setup packages"""
+    setup_llamafactory()
+    
     caller_locals = inspect.stack()[1][0].f_locals
     dataset_names = ",".join(
         [
@@ -193,17 +207,17 @@ def train_llamafactory(datasets, num_train_epochs, continue_training=True):
     )
 
     if not continue_training:
-        os.system("rm -rf /content/LLaMA-Factory/qwen_lora")
+        os.system("rm -rf /content/LLaMA-Factory/gemma_lora")
 
     args = dict(
         stage="sft",
         do_train=True,
-        model_name_or_path="Qwen/Qwen3-8B",
+        model_name_or_path="ura-hcmut/GemSUra-2B",
         dataset=dataset_names,
-        template="qwen3",
+        template="gemma",
         finetuning_type="lora",
         lora_target="all",
-        output_dir="qwen_lora",
+        output_dir="gemma_lora",
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
         lr_scheduler_type="cosine",
@@ -219,32 +233,17 @@ def train_llamafactory(datasets, num_train_epochs, continue_training=True):
         fp16=True,
     )
 
-    file_path = "/content/LLaMA-Factory/train_qwen.json"
-    
-    # Xóa file config cũ nếu tồn tại để tránh dùng model name cũ
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    file_path = "/content/LLaMA-Factory/train_gemma.json"
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=4)
 
-    print("=" * 80)
-    print("🚀 BẮT ĐẦU TRAINING VỚI LLaMA-FACTORY")
-    print("=" * 80)
-    print(f"📊 Model: {args['model_name_or_path']}")
-    print(f"📁 Dataset: {dataset_names}")
-    print(f"🔄 Epochs: {num_train_epochs}")
-    print(f"📦 Batch size: {args['per_device_train_batch_size']} x {args['gradient_accumulation_steps']}")
-    print(f"📈 Learning rate: {args['learning_rate']}")
-    print(f"💾 Output dir: {args['output_dir']}")
-    print("=" * 80)
-    print()
-
     os.chdir("/content/LLaMA-Factory")
-
-    subprocess.run(["pip", "install", "-e", ".[torch,bitsandbytes]"], check=True)
+    
+    # Đảm bảo LLaMA-Factory đã được cài đặt (đã setup trong setup_llamafactory())
+    # Chỉ cài lại nếu cần thiết
     process = subprocess.Popen(
-        ["llamafactory-cli", "train", "train_qwen.json"],
+        ["llamafactory-cli", "train", "train_gemma.json"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -259,19 +258,21 @@ def train_llamafactory(datasets, num_train_epochs, continue_training=True):
             print(decoded_line, end="")
 
     process.stdout.close()
-    return_code = process.wait()
+    process.wait()
+
+
+class SuppressLogging:
+    def __enter__(self):
+        logging.disable(logging.CRITICAL)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logging.disable(logging.NOTSET)
+
+
+def test():
+    """Test model đã được train với LLaMA-Factory - tự động setup packages"""
+    setup_llamafactory()
     
-    print()
-    print("=" * 80)
-    if return_code == 0:
-        print("✅ TRAINING HOÀN THÀNH!")
-    else:
-        print("❌ TRAINING CÓ LỖI! (Return code:", return_code, ")")
-    print("=" * 80)
-
-
-def test_llamafactory():
-    """Test model đã được train với LLaMA-Factory"""
     os.chdir("/content/LLaMA-Factory/src")
     from llamafactory.chat import ChatModel
     from llamafactory.extras.misc import torch_gc
@@ -279,9 +280,9 @@ def test_llamafactory():
     os.chdir("/content/LLaMA-Factory")
 
     args = dict(
-        model_name_or_path="Qwen/Qwen3-8B",
-        adapter_name_or_path="qwen_lora",
-        template="qwen3",
+        model_name_or_path="ura-hcmut/GemSUra-2B",
+        adapter_name_or_path="gemma_lora",
+        template="gemma",
         finetuning_type="lora",
         quantization_bit=4,
     )
@@ -313,26 +314,28 @@ def test_llamafactory():
     torch_gc()
 
 
-def merge_and_push_llamafactory(repo_id):
-    """Merge và push model lên Hugging Face với LLaMA-Factory"""
+def merge_and_push(repo_id):
+    """Merge và push model lên Hugging Face với LLaMA-Factory - tự động setup packages"""
+    setup_llamafactory()
+    
     os.chdir("/content/LLaMA-Factory/")
 
     args = dict(
-        model_name_or_path="Qwen/Qwen3-8B",
-        adapter_name_or_path="qwen_lora",
-        template="qwen3",
+        model_name_or_path="ura-hcmut/GemSUra-2B",
+        adapter_name_or_path="gemma_lora",
+        template="gemma",
         finetuning_type="lora",
-        export_dir="qwen_lora_merged",
+        export_dir="gemma_lora_merged",
         export_size=2,
         export_device="cpu",
     )
 
-    with open("qwen_lora_merged.json", "w", encoding="utf-8") as f:
+    with open("gemma_lora_merged.json", "w", encoding="utf-8") as f:
         json.dump(args, f, ensure_ascii=False, indent=2)
 
     with SuppressLogging(), open(os.devnull, "w") as devnull:
         subprocess.run(
-            ["llamafactory-cli", "export", "qwen_lora_merged.json"],
+            ["llamafactory-cli", "export", "gemma_lora_merged.json"],
             stdout=devnull,
             stderr=devnull,
             check=True,
@@ -340,8 +343,8 @@ def merge_and_push_llamafactory(repo_id):
 
     print("***** Đã merge model thành công và tiến hành upload lên Huggingface! *****")
 
-    model_dir = "/content/LLaMA-Factory/qwen_lora_merged"
-    tokenizer_dir = "/content/LLaMA-Factory/qwen_lora"
+    model_dir = "/content/LLaMA-Factory/gemma_lora_merged"
+    tokenizer_dir = "/content/LLaMA-Factory/gemma_lora"
 
     tokenizer_config_path = Path(tokenizer_dir) / "tokenizer_config.json"
     with open(tokenizer_config_path, "r", encoding="utf-8") as f:
@@ -381,98 +384,18 @@ def merge_and_push_llamafactory(repo_id):
         )
 
 
-class SuppressLogging:
-    def __enter__(self):
-        logging.disable(logging.CRITICAL)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        logging.disable(logging.NOTSET)
-
-
-def test():
-    """Test model đã được train với unsloth"""
-    global model, tokenizer
-    
-    if model is None or tokenizer is None:
-        print("⚠️ Model chưa được load. Đang load model từ 'qwen_lora'...")
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name="qwen_lora",
-            max_seq_length=2048,
-            dtype=None,
-            load_in_4bit=True,
-        )
-        FastLanguageModel.for_inference(model)
-        print("✅ Đã load model xong!\n")
-    
-    print("***** Nhập clear để xóa lịch sử trò chuyện, nhập exit để thoát nha! *****")
-    messages = []
-    
-    while True:
-        query = input("\nNgười dùng: ")
-        if query.strip().lower() == "exit":
-            break
-        if query.strip().lower() == "clear":
-            messages = []
-            print("Lịch sử trò chuyện vừa được xóa.")
-            continue
-
-        # Format prompt
-        prompt = f"<|im_start|>user\n{query}<|im_end|>\n<|im_start|>assistant\n"
-        
-        inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-        
-        print(f"Trợ lý: ", end="", flush=True)
-        
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=256,
-            temperature=0.7,
-            use_cache=True,
-            do_sample=True,
-        )
-        
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        # Extract response after "assistant"
-        if "assistant" in response:
-            response = response.split("assistant")[-1].strip()
-        if "<|im_end|>" in response:
-            response = response.split("<|im_end|>")[0].strip()
-        
-        print(response)
-        messages.append({"role": "user", "content": query})
-        messages.append({"role": "assistant", "content": response})
-
-
-def merge_and_push(repo_id):
-    """Merge LoRA weights vào base model và push lên Hugging Face với unsloth"""
-    global model, tokenizer, HF_TOKEN
-    
-    if model is None:
-        print("⚠️ Model chưa được load. Đang load model từ 'qwen_lora'...")
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name="qwen_lora",
-            max_seq_length=2048,
-            dtype=None,
-            load_in_4bit=True,
-        )
-        print("✅ Đã load model xong!\n")
-    
-    print("🔄 Đang merge LoRA weights vào base model...")
-    model.save_pretrained_merged("qwen_lora_merged", tokenizer, save_method="merged_16bit")
-    print("✅ Đã merge xong!\n")
-    
-    print(f"📤 Đang push model lên {repo_id}...")
-    model.push_to_hub(repo_id, token=HF_TOKEN, save_method="merged_16bit")
-    tokenizer.push_to_hub(repo_id, token=HF_TOKEN)
-    print(f"✅ Đã push model lên {repo_id} thành công!")
-
-
 model = None
 tokenizer = None
 messages = []
 
 
 def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
+    """Load model với unsloth để inference - tự động setup packages"""
+    setup_unsloth()
+    
+    # Import động sau khi setup
+    from unsloth import FastLanguageModel
+    
     logging.getLogger().setLevel(logging.ERROR)
     global model, tokenizer
 
@@ -484,11 +407,19 @@ def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
             load_in_4bit=load_in_4bit,
         )
         FastLanguageModel.for_inference(model)
+        print(f"✅ Đã load model {model_name} thành công!")
     except Exception as e:
+        print(f"Lỗi khi load model: {e}")
         print("Bạn chỉ cần chạy inference một lần duy nhất, bạn không cần chạy lại!")
 
 
 def chat(max_new_tokens=128, history=True):
+    """Chat với model đã load bằng unsloth - tự động setup packages"""
+    setup_unsloth()
+    
+    # Import động sau khi setup
+    from unsloth import FastLanguageModel
+    
     global model, tokenizer, messages
 
     chat_template = """{{ '<bos>' }}{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{% endif %}{% if system_message is defined %}{{ system_message }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<start_of_turn>user\n' + content + '<end_of_turn>\n<start_of_turn>model\n' }}{% elif message['role'] == 'assistant' %}{{ content + '<end_of_turn>\n' }}{% endif %}{% endfor %}"""
@@ -532,6 +463,12 @@ def chat(max_new_tokens=128, history=True):
 
 
 def quantize_and_push(repo_id):
+    """Quantize model sang GGUF format và push lên Hugging Face - tự động setup packages"""
+    setup_unsloth()
+    
+    # Import động sau khi setup
+    from unsloth import FastLanguageModel
+    
     logging.getLogger("unsloth").setLevel(logging.CRITICAL)
     original_stdout = sys.stdout
     original_stderr = sys.stderr
