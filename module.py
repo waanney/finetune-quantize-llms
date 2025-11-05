@@ -7,7 +7,7 @@ import logging
 import inspect
 import subprocess
 import contextlib
-from unsloth import FastLanguageModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset, Dataset
 from IPython.display import display
 from huggingface_hub import login, HfApi
@@ -263,14 +263,32 @@ def inference(model_name, max_seq_length=2048, dtype=None, load_in_4bit=True):
     global model, tokenizer
 
     try:
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name=model_name,
-            max_seq_length=max_seq_length,
-            dtype=dtype,
-            load_in_4bit=load_in_4bit,
+        # Load tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        
+        # Configure quantization if needed
+        quantization_config = None
+        if load_in_4bit:
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=dtype if dtype else torch.float16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4"
+            )
+        
+        # Load model
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            quantization_config=quantization_config,
+            torch_dtype=dtype if dtype else torch.float16,
+            trust_remote_code=True,
+            device_map="auto"
         )
-        FastLanguageModel.for_inference(model)
+        
+        # Set model to evaluation mode
+        model.eval()
     except Exception as e:
+        print(f"Lỗi khi load model: {e}")
         print("Bạn chỉ cần chạy inference một lần duy nhất, bạn không cần chạy lại!")
 
 
@@ -300,7 +318,10 @@ def chat(max_new_tokens=128, history=True):
 
         print(f"Trợ lý: ", end="", flush=True)
 
-        inputs = tokenizer(input_text, return_tensors="pt").to("cpu")
+        inputs = tokenizer(input_text, return_tensors="pt")
+        # Move inputs to the same device as model
+        device = next(model.parameters()).device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
 
         outputs = model.generate(
             **inputs, max_new_tokens=max_new_tokens, use_cache=True
@@ -320,23 +341,31 @@ def chat(max_new_tokens=128, history=True):
 
 
 def quantize_and_push(repo_id):
-    logging.getLogger("unsloth").setLevel(logging.CRITICAL)
+    """
+    Push model lên Hugging Face Hub ở dạng quantized (4-bit hoặc 8-bit).
+    Lưu ý: Hàm này push model ở dạng hiện tại (đã quantized nếu có).
+    Để quantize sang GGUF format, bạn cần dùng llama.cpp hoặc công cụ khác.
+    """
+    logging.getLogger().setLevel(logging.ERROR)
     original_stdout = sys.stdout
     original_stderr = sys.stderr
     temp_stdout = io.StringIO()
-    os.chdir("/content")
 
     global model, tokenizer, HF_TOKEN
+    
     try:
         with contextlib.redirect_stdout(temp_stdout), contextlib.redirect_stderr(
             temp_stdout
         ):
-            model.push_to_hub_gguf(
-                repo_id, tokenizer, token=HF_TOKEN
-            )
+            # Push model và tokenizer lên Hugging Face Hub
+            model.push_to_hub(repo_id, token=HF_TOKEN, private=False)
+            tokenizer.push_to_hub(repo_id, token=HF_TOKEN, private=False)
+            
+            print(f"***** Đã push model và tokenizer lên {repo_id} thành công! *****")
     except Exception as e:
         sys.stdout = original_stdout
         sys.stderr = original_stderr
+        print(f"Lỗi khi push model lên Hub: {e}")
         return
     finally:
         temp_stdout.seek(0)
@@ -345,11 +374,9 @@ def quantize_and_push(repo_id):
     sys.stdout = original_stdout
     sys.stderr = original_stderr
 
-    start_printing = False
+    # Print output if needed
     for line in output_lines:
-        if "main: quantize time" in line.lower():
-            start_printing = True
-        if start_printing:
+        if "pushing" in line.lower() or "uploading" in line.lower() or "error" in line.lower():
             print(line, end="")
 
 
