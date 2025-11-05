@@ -10,16 +10,6 @@ jinja2
 pandas==2.2.2
 numpy<2.1,>=1.26.0
 requests==2.32.4
-# pyarrow - let Google Colab manage this version to avoid conflicts with bigframes/gcsfs
-# pyarrow<15.0.0a0,>=14.0.1
+pyarrow>=15.0.2,<20.0.0
+absl-py  # Required by unsloth/transformers
 
-# Note: The following packages are managed dynamically by module.py:
-# - unsloth, trl, transformers, peft, accelerate, bitsandbytes (for Unsloth)
-# - llamafactory, llamafactory-cli (for LLaMA-Factory)
-# These will be automatically installed/uninstalled as needed when calling functions.
-# No need to install them manually or restart runtime when switching between tools.
-#
-# Note about dependency conflicts:
-# Some packages pre-installed in Google Colab (gcsfs, bigframes, numba) may show conflicts
-# but these won't affect the core functionality. The versions specified here prioritize
-# compatibility with the training and quantization workflows.
